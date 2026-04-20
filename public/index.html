@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Max Official</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --red: #c0392b; --white: #fff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; }
+        .page { display: none; padding: 20px; max-width: 450px; margin: auto; }
+        .active { display: block; }
+        .card { background: var(--white); padding: 25px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-red { background: var(--red); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        /* Animated Heart Loop */
+        .heart-container { text-align: center; margin-top: 50px; }
+        .heart { font-size: 80px; color: var(--red); animation: beat 1.2s infinite; }
+        @keyframes beat { 0% {transform: scale(1);} 50% {transform: scale(1.2);} 100% {transform: scale(1);} }
+    </style>
+</head>
+<body>
+
+    <div id="step1" class="page active">
+        <div class="card">
+            <h2>Terms & Conditions</h2>
+            <p>I agree to provide real information and follow Virtual Max rules.</p>
+            <button class="btn-red" onclick="showStep(2)">Agree to Continue</button>
+        </div>
+    </div>
+
+    <div id="step2" class="page">
+        <div class="card">
+            <h2>Step 2: Account</h2>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn-red" onclick="handleAuth()">Next</button>
+        </div>
+    </div>
+
+    <div id="step3" class="page">
+        <div class="card">
+            <h2>Step 3: Personal Info</h2>
+            <input type="text" id="fname" placeholder="Full Name">
+            <input type="number" id="phone" placeholder="Phone (03xxxxxxxx)">
+            <select id="country"><option>Pakistan</option><option>USA</option></select>
+            <input type="text" id="city" placeholder="City">
+            <button class="btn-red" onclick="savePersonalInfo()">Next</button>
+        </div>
+    </div>
+
+    <div id="step4" class="page">
+        <div class="card">
+            <h2>Step 4: Payment</h2>
+            <p>Pay $2.50 to EasyPaisa: 03468673795</p>
+            <input type="text" id="trx" placeholder="Enter Transaction ID">
+            <button class="btn-red" onclick="submitPayment()">Submit Details</button>
+        </div>
+    </div>
+
+    <div id="step5" class="page">
+        <div class="heart-container">
+            <div class="heart">❤️</div>
+            <h3>Verifying...</h3>
+            <p>Please wait while Admin approves your account.</p>
+        </div>
+    </div>
+
+    <div id="dashboard" class="page">
+        <div class="card" style="background: var(--red); color: white;">
+            <h2>Balance: <span id="balance">$0.00</span></h2>
+            <button class="btn-red" style="background: white; color: var(--red);">Increase Earning</button>
+        </div>
+    </div>
+
+<script>
+    const supabase = supabase.createClient('YOUR_URL', 'YOUR_KEY');
+    let userId = null;
+
+    function showStep(s) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('step' + s) ? document.getElementById('step' + s).classList.add('active') : document.getElementById('dashboard').classList.add('active');
+    }
+
+    async function handleAuth() {
+        const { data, error } = await supabase.auth.signUp({ 
+            email: document.getElementById('email').value, 
+            password: document.getElementById('pass').value 
+        });
+        if (data.user) { userId = data.user.id; showStep(3); }
+    }
+
+    async function savePersonalInfo() {
+        showStep(4);
+    }
+
+    async function submitPayment() {
+        const payload = {
+            userId,
+            fullName: document.getElementById('fname').value,
+            phone: document.getElementById('phone').value,
+            country: document.getElementById('country').value,
+            city: document.getElementById('city').value,
+            trxId: document.getElementById('trx').value,
+            status: 'pending_approval'
+        };
+        
+        await fetch('YOUR_BACKEND_URL/api/update-flow', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        });
+
+        showStep(5);
+        startStatusCheck();
+    }
+
+    function startStatusCheck() {
+        const check = setInterval(async () => {
+            const res = await fetch('YOUR_BACKEND_URL/api/status/' + userId);
+            const data = await res.json();
+            if (data.status === 'active') {
+                clearInterval(check);
+                document.getElementById('balance').innerText = "$" + data.balance;
+                showStep(6);
+            }
+        }, 5000);
+    }
+</script>
+</body>
+</html>
