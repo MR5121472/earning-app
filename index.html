@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Earning Pro</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script defer src="supabase.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <h2 id="user">Welcome</h2>
+  <p>Balance</p>
+  <div class="balance">$<span id="bal">0</span></div>
+</div>
+
+<div class="card">
+  <h3>Login / Register</h3>
+  <input id="name" placeholder="Name">
+  <input id="phone" placeholder="Phone">
+  <input id="ref" placeholder="Referral Code">
+  <button class="btn-main" onclick="register()">Register</button>
+  <button class="btn-dark" onclick="login()">Login</button>
+</div>
+
+<div class="grid">
+  <div class="menu-box" onclick="task()">🎯 Task</div>
+  <div class="menu-box" onclick="watchAd()">📺 Ads</div>
+  <div class="menu-box" onclick="spin()">🎡 Spin</div>
+  <div class="menu-box">👥 Refer</div>
+</div>
+
+<div class="card">
+  <h3>Withdraw</h3>
+  <input id="amount" placeholder="Amount">
+  <input id="method" placeholder="JazzCash">
+  <input id="account" placeholder="03xxxx">
+  <button class="btn-green" onclick="withdraw()">Withdraw</button>
+</div>
+
+<div class="footer">
+  <button class="active">Home</button>
+  <button>Tasks</button>
+  <button>Wallet</button>
+  <button>Profile</button>
+</div>
+
+</body>
+</html>
